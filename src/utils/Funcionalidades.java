@@ -1,24 +1,34 @@
 package utils;
 
+import utils.enums.TipoOperacao;
+import utils.models.ContaCorrente;
+import utils.models.Poupanca;
+import utils.models.Transacao;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class Funcionalidades implements IServicos{
 
-    Poupanca poupanca = new Poupanca();
-    ContaCorrente contaCorrente = new ContaCorrente();
+    private List<Transacao> transacoes = new ArrayList<>();
+
+
     @Override
     public void deposito(Object conta, double valor, UUID idConta, String agencia) {
         if(conta instanceof Poupanca){
             if(((Poupanca) conta).getIdConta().equals(idConta)
                     && ((Poupanca) conta).getAgencia().equals(agencia)){
-                ((Poupanca) conta).setSaldo(poupanca.getSaldo() + valor);
+                ((Poupanca) conta).setSaldo(((Poupanca) conta).getSaldo() + valor);
+                transacoes.add(new Transacao("Depósito em poupança", valor, TipoOperacao.DEPOSITO, ((Poupanca) conta).getSaldo()));
                 System.out.println("R$" + valor + " Depositado com sucesso na poupança");
                 System.out.println();
             }
         }else if(conta instanceof ContaCorrente){
             if(((ContaCorrente) conta).getIdConta().equals(idConta)
                     && ((ContaCorrente) conta).getAgencia().equals(agencia)){
-                ((ContaCorrente) conta).setSaldo(contaCorrente.getSaldo() + valor);
+                ((ContaCorrente) conta).setSaldo(((ContaCorrente) conta).getSaldo() + valor);
+                transacoes.add(new Transacao("Depósito em conta corrente", valor, TipoOperacao.DEPOSITO, ((ContaCorrente) conta).getSaldo()));
                 System.out.println("R$" + valor + " Depositado com sucesso na conta corrente");
                 System.out.println();
             }
@@ -36,6 +46,7 @@ public class Funcionalidades implements IServicos{
                     System.out.println();
                 }else{
                     ((Poupanca) conta).setSaldo(((Poupanca) conta).getSaldo() - valor);
+                    transacoes.add(new Transacao("Saque em poupança", valor, TipoOperacao.SAQUE, ((Poupanca) conta).getSaldo()));
                     System.out.println("Valor de R$" + valor + " retirado com sucesso da poupança!!!");
                     System.out.println("Saldo atualizado da poupança: R$" + ((Poupanca) conta).getSaldo());
                     System.out.println();
@@ -48,6 +59,7 @@ public class Funcionalidades implements IServicos{
                     System.out.println("Saldo insuficiente para saque na conta corrente!!!");
                 }else{
                     ((ContaCorrente) conta).setSaldo(((ContaCorrente) conta).getSaldo() - valor);
+                    transacoes.add(new Transacao("Saque em conta corrente", valor, TipoOperacao.SAQUE, ((ContaCorrente) conta).getSaldo()));
                     System.out.println("Valor de R$" + valor + " retirado com sucesso da conta corrente!!!");
                     System.out.println("Saldo atualizado da conta corrente: R$" + ((ContaCorrente) conta).getSaldo());
                     System.out.println();
@@ -78,6 +90,7 @@ public class Funcionalidades implements IServicos{
                     }
                 }
                 System.out.println(" >>> Transferência realizada com sucesso!");
+                transacoes.add(new Transacao("Transferência de poupança para conta corrente", valor, TipoOperacao.TRANSFERENCIA,((Poupanca) contaSaida).getSaldo()));
                 System.out.println();
             }
         } else if(contaSaida instanceof ContaCorrente){
@@ -98,6 +111,7 @@ public class Funcionalidades implements IServicos{
                     }
                 }
                 System.out.println(" >>> Transferência realizada com sucesso!");
+                transacoes.add(new Transacao("Transferência de conta corrente para poupança", valor, TipoOperacao.TRANSFERENCIA, ((ContaCorrente) contaSaida).getSaldo()));
                 System.out.println();
             }else{
                 System.out.println("Conta não encontrada para o ID: " + idContaSaida);
@@ -123,5 +137,20 @@ public class Funcionalidades implements IServicos{
         }else{
             System.out.println("Conta não encontrada para o ID: " + idConta);
         }
+    }
+
+    public void mostrarExtrato(){
+        System.out.println("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+        System.out.println(">>>>>>        EXTRATO        <<<<<<");
+        transacoes.forEach(transacao -> {
+            System.out.println(">>> Id da transação: " + transacao.getIdTransacao());
+            System.out.println(">>> Descrição: " + transacao.getDescricao());
+            System.out.println(">>> Valor da transação R$" + transacao.getValor());
+            System.out.println(">>> Tipo de operação: " + transacao.getTipoOperacao());
+            System.out.println(">>> Saldo após a operação R$" + transacao.getSaldoAfter());
+            System.out.println(">>> Momento da  transação: " + transacao.getData_hora());
+            System.out.println("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-");
+        });
+
     }
 }

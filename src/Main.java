@@ -1,8 +1,6 @@
-import utils.ContaCorrente;
+import utils.models.ContaCorrente;
 import utils.Funcionalidades;
-import utils.Poupanca;
-
-import java.util.Scanner;
+import utils.models.Poupanca;
 
 public class Main {
     public static void main(String[] args) {
@@ -36,6 +34,7 @@ public class Main {
         servicos.consultarSaldo(poupanca, poupanca.getIdConta(), poupanca.getAgencia());
         servicos.consultarSaldo(contaCorrente, contaCorrente.getIdConta(), contaCorrente.getAgencia());
 
+        servicos.mostrarExtrato();
 
     }
 }
